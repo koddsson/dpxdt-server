@@ -1,5 +1,9 @@
 # Depicted—dpxdt
 
+[![Build Status](https://travis-ci.org/koddsson/dpxdt-server.svg?branch=master-travis)](https://travis-ci.org/koddsson/dpxdt-server)
+
+[![Coverage Status](https://coveralls.io/repos/koddsson/dpxdt-server/badge.svg)](https://coveralls.io/r/koddsson/dpxdt-server)
+
 Make continuous deployment safe by comparing before and after webpage 
 screenshots for each release. Depicted shows when any visual, perceptual 
 differences are found. This is the ultimate, automated end-to-end test.
