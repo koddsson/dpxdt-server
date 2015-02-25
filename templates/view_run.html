@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title -%}
+{{ build.name }} &rsaquo; {{release.name}} #{{ release.number }} &rsaquo; {{ run.name }}
+{%- endblock title %}
+
+{% block description -%}
+Test run '{{ run.name }}'
+{%- endblock description %}
+
+
+{% block run_row_left %}
+    {% if sha1sum %}
+        <a class="big-link" id="test_link" href="{{ url_for('view_run', id=build.id, name=release.name, number=release.number, test=run.name) }}">Test: {{ run.name }}</a>
+    {% else %}
+        Test: {{ run.name }}
+    {% endif %}
+{% endblock run_row_left %}
+
+
+{% block run_row_right %}
+    {% if approval_log %}
+        Approved
+    {% else %}
+        Updated
+    {% endif %}
+    <abbr title="{{ run.modified.strftime('%Y-%m-%dT%H:%MZ') }}">{{ run.modified|timesince }}</abbr>
+    {% if approval_log %}
+        by {{ approval_log.user.email_address }}
+    {% endif %}
+{% endblock run_row_right %}
+
+
+{% block body %}
+
+<div class="row body-section">
+    <div class="span12">
+        {% set alert_wrapper=True %}
+        {% include 'fragment_run_status.html' with context %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="span12">
+        <div class="row">
+            <div class="span7">
+                {% if run.status == 'diff_found' %}
+                    <form action="{{ url_for(request.endpoint) }}" method="post" class="inline-block">
+                        {{ run_form.csrf_token }}
+                        {{ run_form.id }}
+                        {{ run_form.name }}
+                        {{ run_form.number }}
+                        {{ run_form.type }}
+                        {{ run_form.test }}
+                        {{ run_form.approve }}
+                        <p>
+                            <button type="submit" class="btn btn-primary" id="approve_button">Approve difference</button>
+                        </p>
+                    </form>
+                {% elif run.status == 'diff_approved' %}
+                    <form action="{{ url_for(request.endpoint) }}" method="post" class="inline-block">
+                        {{ run_form.csrf_token }}
+                        {{ run_form.id }}
+                        {{ run_form.name }}
+                        {{ run_form.number }}
+                        {{ run_form.type }}
+                        {{ run_form.test }}
+                        {{ run_form.disapprove }}
+                        <p>
+                            <button type="submit" class="btn btn-danger" id="reject_button">Reject difference</button>
+                        </p>
+                    </form>
+                {% endif %}
+            </div>
+            <div class="span5 text-right">
+                <p>
+                {% if previous_run %}
+                    <a href="{{ url_for(request.endpoint, id=build.id, name=release.name, number=release.number, test=previous_run.name, type=file_type) }}" class="btn" id="previous_button">&larr; Prev test</a>
+                {% endif %}
+                {% if next_run %}
+                    <a href="{{ url_for(request.endpoint, id=build.id, name=release.name, number=release.number, test=next_run.name, type=file_type) }}" class="btn" id="next_button">&thinsp;Next test &rarr;</a>
+                {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block run_detail %}{% endblock run_detail %}
+
+{% endblock body %}
+
+
+{% block belowbody %}
+
+<div class="container-fluid">
+
+    <div class="row-fluid body-section">
+        <div class="span4">
+            <div class="row-fluid">
+                <div class="span6">
+                    <strong>Before</strong>
+                </div>
+                <div class="span6 text-right">
+                    <small>
+                        {% if run.ref_url %}
+                            <a href="{{ run.ref_url }}" target="_blank">Visit</a>
+                        {% endif %}
+                        {% if run.ref_url and run.ref_config %}
+                            &ndash;
+                        {% endif %}
+                        {% if run.ref_config %}
+                            <a href="{{ url_for('view_config', id=build.id, name=release.name, number=release.number, test=run.name, type='before') }}">Config</a>
+                        {% endif %}
+                        {% if run.ref_config and run.ref_log %}
+                            &ndash;
+                        {% endif %}
+                        {% if run.ref_log %}
+                            <a href="{{ url_for('view_log', id=build.id, name=release.name, number=release.number, test=run.name, type='before') }}">Log</a>
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    {% if run.ref_image %}
+                        <a class="run-image-link" href="{{ url_for('view_image', id=build.id, name=release.name, number=release.number, test=run.name, type='before') }}"><img src="{{ url_for('download', sha1sum=run.ref_image, build_id=build.id) }}" class="run-image"></a>
+                    {% else %}
+                        No image
+                        {%- if run.ref_log -%}
+                            : See log
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="span4">
+            <div class="row-fluid">
+                <div class="span6">
+                    <strong>Diff</strong>
+                </div>
+                <div class="span6 text-right">
+                    <small>
+                        {% if run.diff_log %}
+                            <a href="{{ url_for('view_log', id=build.id, name=release.name, number=release.number, test=run.name, type='diff') }}">Log</a>
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    {% if run.diff_image %}
+                        <a class="run-image-link" href="{{ url_for('view_image', id=build.id, name=release.name, number=release.number, test=run.name, type='diff') }}"><img src="{{ url_for('download', sha1sum=run.diff_image, build_id=build.id) }}" class="run-image"></a>
+                    {% else %}
+                        No image
+                        {%- if run.diff_log -%}
+                            : See log
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="span4">
+            <div class="row-fluid">
+               <div class="span6">
+                    <strong>After</strong>
+                </div>
+                <div class="span6 text-right">
+                    <small>
+                        {% if run.url %}
+                            <a href="{{ run.url }}" target="_blank">Visit</a>
+                        {% endif %}
+                        {% if run.url and run.config %}
+                            &ndash;
+                        {% endif %}
+                        {% if run.config %}
+                            <a href="{{ url_for('view_config', id=build.id, name=release.name, number=release.number, test=run.name, type='after') }}">Config</a>
+                        {% endif %}
+                        {% if run.config and run.log %}
+                            &ndash;
+                        {% endif %}
+                        {% if run.log %}
+                            <a href="{{ url_for('view_log', id=build.id, name=release.name, number=release.number, test=run.name, type='after') }}">Log</a>
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    {% if run.image %}
+                        <a class="run-image-link" href="{{ url_for('view_image', id=build.id, name=release.name, number=release.number, test=run.name, type='after') }}"><img src="{{ url_for('download', sha1sum=run.image, build_id=build.id) }}" class="run-image"></a>
+                    {% else %}
+                        No image
+                        {%- if run.log -%}
+                            : See log
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock belowbody%}
+
+
+{% block beforefooter %}
+    {# Preload the images of the next run and related pages. #}
+    <script>
+        var nextUrls = [];
+        {% if next_run %}
+            {% if next_run.image %}
+                nextUrls.push("{{ url_for('download', sha1sum=next_run.image, build_id=build.id)|safe }}");
+            {% endif %}
+            {% if next_run.diff_image %}
+                nextUrls.push("{{ url_for('download', sha1sum=next_run.diff_image, build_id=build.id)|safe }}");
+            {% endif %}
+            {% if next_run.ref_image %}
+                nextUrls.push("{{ url_for('download', sha1sum=next_run.ref_image, build_id=build.id)|safe }}");
+            {% endif %}
+        {% endif %}
+
+        for (var i = 0; i < nextUrls.length; i++) {
+            var url = nextUrls[i];
+            console.log('Prefetching: ' + url);
+            $.get(url);
+        }
+    </script>
+{% endblock beforefooter %}

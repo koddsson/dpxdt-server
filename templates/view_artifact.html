@@ -1,0 +1,77 @@
+{% extends 'view_run.html' %}
+
+
+{% block run_detail %}
+
+<div class="row diff-section">
+    <div class="span12">
+        {% if image_file %}
+            Image:
+        {% elif log_file %}
+            Log:
+        {% elif config_file %}
+            Config:
+        {% endif %}
+        {% for type in ('before', 'diff', 'after') %}
+            {% if type == 'diff' and request.endpoint == 'view_config' %}
+                {# Do not show a config link for diffs #}
+            {% else %}
+                {% if file_type == type %}
+                    <span class="flip-link flip-link-selected" class="artifact-type-selected">{{ type|title }}</span>
+                {% else %}
+                    <a class="flip-link" href="{{ url_for(request.endpoint, id=build.id, name=release.name, number=release.number, test=run.name, type=type) }}">{{ type|title }}</a>
+                {% endif %}
+                {% if not loop.last %}
+                    &ndash;
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock run_detail %}
+
+
+{% block belowbody %}
+
+{% if not sha1sum %}
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span12 text-center">
+                <strong>Nothing</strong>
+            </div>
+        </div>
+    </div>
+{% elif image_file %}
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span12 text-center">
+                <div class="run-image-link">
+                    <img src="{{ url_for('download', sha1sum=sha1sum, build_id=build.id) }}" class="run-image">
+                </div>
+            </div>
+        </div>
+    </div>
+{% elif log_file or config_file %}
+    <div id="artifact-iframe-container" class="container">
+        <iframe src="{{ url_for('download', sha1sum=sha1sum, build_id=build.id) }}" id="artifact-iframe"></iframe>
+    </div>
+    <script>
+        function handleResize() {
+            var body = $('#body-container');
+            var bodyOffset = body.offset();
+            var container = $('#artifact-iframe-container');
+            container.css('top', bodyOffset.top + body.outerHeight(true));
+            var iframe = $('#artifact-iframe');
+            iframe.css('height', container.outerHeight(true));
+        }
+        $(window).resize(handleResize);
+        $(document).ready(handleResize);
+        $('#artifact-iframe').load(handleResize);
+    </script>
+{% endif %}
+
+{% endblock belowbody %}
+
+{# Don't show the footer for artifacts; they take up the whole screen. #}
+{% block footer_container %}{% endblock footer_container %}

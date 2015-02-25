@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title -%}
+{{ build.name }}
+{%- endblock title %}
+
+{% block description -%}
+Build '{{ build.name }}'
+{%- endblock description %}
+
+
+{% block body %}
+
+{% if release_name_list %}
+    <div class="row">
+        <div class="span12">
+            <h4>Releases</h4>
+        </div>
+    </div>
+    <div class="row body-section">
+        <div class="span12">
+            {% for release_name in release_name_list %}
+                {% with candidate_list=release_dict[release_name] %}
+                    <div class="row build-release-section">
+                        <div class="span12">
+                            <div class="build-release-first-row">
+                                <div class="row">
+                                    <div class="span2 ellipsis-overflow">
+                                        {{ release_name }}
+                                    </div>
+                                    <div class="span2">
+                                        {% if candidate_list|length == 1 %}
+                                            1 candidate
+                                        {% elif candidate_list|length > 1 %}
+                                            {{ candidate_list|length }} candidates
+                                        {% else %}
+                                            No candidates
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% for candidate in candidate_list %}
+                                <div class="row build-candidate-section">
+                                    <div class="span2 offset2">
+                                        <a href="{{ url_for('view_release', id=build.id, name=candidate.name, number=candidate.number) }}" class="big-link">Attempt #{{ candidate.number }}</a>
+                                    </div>
+                                    <div class="span2">
+                                        <abbr title="Created {{ candidate.created.strftime('%Y-%m-%dT%H:%MZ') }}">
+                                            {{ candidate.created|timesince }}
+                                        </abbr>
+                                    </div>
+                                    {% with stats_dict = run_stats_dict[candidate.id] %}
+                                        {% set alert_wrapper=False %}
+                                        {% set runs_total = stats_dict.runs_total %}
+                                        {% set runs_complete = stats_dict.runs_complete %}
+                                        {% set runs_successful = stats_dict.runs_successful %}
+                                        {% set runs_failed = stats_dict.runs_failed %}
+                                        {% set runs_baseline = stats_dict.runs_baseline %}
+                                        {% set runs_pending = stats_dict.runs_pending %}
+                                        <div class="span2">
+                                            {% include 'fragment_runs_complete.html' with context %}
+                                        </div>
+                                        <div class="span2">
+                                            {% include 'fragment_runs_failed.html' with context %}
+                                        </div>
+                                    {% endwith %}
+                                    <div class="span2" title="Current status">
+                                        {% if candidate.status == 'good' %}
+                                            <strong>
+                                                {{ candidate.status|title }}
+                                            </strong>
+                                        {% elif candidate.status == 'bad' %}
+                                            <span class="text-error">
+                                                {{ candidate.status|title }}
+                                            </span>
+                                        {% else %}
+                                            {{ candidate.status|title }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endwith %}
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if has_next_page or current_offset %}
+        <div class="row body-section">
+            <div class="span12">
+                {% if has_next_page %}
+                    <div class="row">
+                        <div class="span2">
+                            <a href="{{ url_for('view_build', id=build.id, offset=next_offset) }}">&laquo; Older</a>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if last_offset < current_offset %}
+                    {% if last_offset == 0 %}
+                        <div class="row">
+                            <div class="span2">
+                                <a href="{{ url_for('view_build', id=build.id) }}">Newer &raquo;</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            <div class="span2">
+                                <a href="{{ url_for('view_build', id=build.id, offset=last_offset) }}">Newer &raquo;</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+{% else %}
+    <div class="row body-section">
+        <div class="span12">
+            <div class="alert alert-info alert-block">
+                There are no releases for this build.
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock body %}
+
+
+{% block footer_left %}
+
+<a href="{{ url_for('build_settings', build_id=build.id) }}">Settings</a>
+&ndash;
+<a href="{{ url_for('manage_admins', build_id=build.id) }}">Admins</a>
+&ndash;
+<a href="{{ url_for('manage_api_keys', build_id=build.id) }}">API keys</a>
+&ndash;
+<a href="{{ url_for('view_admin_log', build_id=build.id) }}">Activity</a>
+
+{% endblock footer_left %}

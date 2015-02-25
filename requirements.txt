@@ -1,0 +1,6 @@
+flask==0.10.1
+flask-cache==0.12
+flask-login
+flask-mail
+flask-sqlalchemy
+flask-wtf==0.8.4

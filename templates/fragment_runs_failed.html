@@ -1,0 +1,44 @@
+{% if runs_failed %}
+    {% set run_status='error' %}
+{% elif runs_total > 0 and runs_successful == runs_total %}
+    {% set run_status='info' %}
+{% elif runs_total %}
+    {% set run_status='warning' %}
+{% else %}
+    {% set run_status='normal' %}
+{% endif %}
+
+{% if alert_wrapper %}
+    <div class="row-fluid status-panel status-panel-{{ run_status }} no-min-height">
+        <strong>
+{% else %}
+    <span {% if inline_style -%}
+            {%- if run_status == 'error' -%}
+                style="color: #b94a48"
+            {%- elif run_status == 'info' -%}
+                style="color: #3a87ad"
+            {%- endif -%}
+        {%- endif -%}
+    >
+{% endif %}
+
+{% if runs_failed == 1 %}
+    1 failure
+{% elif runs_failed > 0 %}
+    {{ runs_failed }} failures
+{% elif runs_total > 0 and runs_successful == runs_total %}
+    All passing
+{% elif runs_pending == 1 %}
+    1 pending
+{% elif runs_pending > 0 %}
+    {{ runs_pending }} pending
+{% else %}
+    Nothing to test
+{% endif %}
+
+{% if alert_wrapper %}
+        </strong>
+    </div>
+{% else %}
+    </span>
+{% endif %}

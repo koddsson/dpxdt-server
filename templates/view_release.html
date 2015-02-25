@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title -%}
+{{ build.name }} &rsaquo; {{release.name}} #{{ release.number }}
+{%- endblock title %}
+
+{% block description -%}
+Release '{{ release.name }}' attempt #{{ release.number }}
+{%- endblock description %}
+
+
+{% block run_row_left %}
+    {% set alert_wrapper=False %}
+    {% set runs_total = stats_dict.runs_total %}
+    {% set runs_complete = stats_dict.runs_complete %}
+    {% set runs_successful = stats_dict.runs_successful %}
+    {% set runs_failed = stats_dict.runs_failed %}
+    {% set runs_baseline = stats_dict.runs_baseline %}
+    {% include 'fragment_runs_complete.html' with context %}
+{% endblock run_row_left %}
+
+
+{% block run_row_right %}
+    {% if approval_log %}
+        Marked
+    {% else %}
+        Updated
+    {% endif %}
+    <abbr title="{{ release.modified.strftime('%Y-%m-%dT%H:%MZ') }}">{{ release.modified|timesince }}</abbr>
+    {% if approval_log %}
+        by {{ approval_log.user.email_address }}
+    {% endif %}
+{% endblock run_row_right %}
+
+
+{% block body %}
+
+<div class="row body-section">
+    <div class="span12">
+        {% set alert_wrapper=True %}
+        {% set runs_total = stats_dict.runs_total %}
+        {% set runs_complete = stats_dict.runs_complete %}
+        {% set runs_successful = stats_dict.runs_successful %}
+        {% set runs_failed = stats_dict.runs_failed %}
+        {% set runs_baseline = stats_dict.runs_baseline %}
+        {% set runs_pending = stats_dict.runs_pending %}
+        {% include 'fragment_runs_failed.html' with context %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="span12">
+        {% if release.status in ('reviewing', 'receiving', 'processing') %}
+            <form action="{{ url_for(request.endpoint) }}" method="post" class="inline-block">
+                {{ release_form.csrf_token }}
+                {{ release_form.id }}
+                {{ release_form.name }}
+                {{ release_form.number }}
+                {{ release_form.good }}
+                <p>
+                    <button type="submit" class="btn btn-primary">Mark release as good</button>
+                </p>
+            </form>
+            <form action="{{ url_for(request.endpoint) }}" method="post" class="inline-block">
+                {{ release_form.csrf_token }}
+                {{ release_form.id }}
+                {{ release_form.name }}
+                {{ release_form.number }}
+                {{ release_form.bad }}
+                <p class="left-of-approval">
+                    <button type="submit" class="btn btn-danger">Mark release as bad</button>
+                </p>
+            </form>
+        {% endif %}
+        {% if release.status == 'good' or  release.status == 'bad' %}
+            <form action="{{ url_for('view_release') }}" method="post" class="inline-block">
+                {{ release_form.csrf_token }}
+                {{ release_form.id }}
+                {{ release_form.name }}
+                {{ release_form.number }}
+                {{ release_form.reviewing }}
+                <p>
+                    <button type="submit" class="btn">Mark release as reviewing</button>
+                </p>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+{% if run_list %}
+    <div class="row body-section">
+        <div class="span12">
+            {% for run in run_list %}
+                <div class="row release-test-section">
+                    <div class="span9 ellipsis-overflow" title="Test name">
+                        <a href="{{ url_for('view_run', id=build.id, name=release.name, number=release.number, test=run.name) }}" class="big-link">{{ run.name }}</a>
+                    </div>
+                    <div class="span3" title="Test status">
+                        {% set alert_wrapper=False %}
+                        {% include 'fragment_run_status.html' with context %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+{% endblock body %}
+
+
+{% block footer_left %}
+    {% if release.url %}
+        <a href="{{ release.url }}" target="_blank">View release landing page</a>
+    {% endif %}
+{% endblock footer_left %}

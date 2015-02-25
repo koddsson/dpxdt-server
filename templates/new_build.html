@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block description -%}
+create build description
+{%- endblock description %}
+
+{% block page_title -%}
+Create new build
+{%- endblock page_title %}
+
+{% block body %}
+
+<div class="row">
+    <div class="span12">
+        {% if build_form.errors %}
+            <div class="row">
+                <div class="span6 alert alert-error">
+                {% for field, field_errors in build_form.errors|dictsort %}
+                    <div>
+                        Invalid {{ build_form[field].label(class="inline") }}
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        <form action="{{ url_for('new_build') }}" method="post">
+            <fieldset>
+                {{ build_form.csrf_token }}
+                {{ build_form.name.label }}
+                {{ build_form.name }}
+                <br>
+                <button type="submit" class="btn">Create</button>
+            </fieldset>
+        </form>
+    </div>
+</div>
+
+{% endblock body %}

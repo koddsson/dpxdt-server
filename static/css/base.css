@@ -1,0 +1,239 @@
+/* Bootstrap overrides and common styles. */
+h1 a:link,
+h1 a:visited,
+h1 a:active,
+h1 a:hover {
+    color: inherit;
+}
+h4 a:link,
+h4 a:visited,
+h4 a:active,
+h4 a:hover {
+    color: inherit;
+}
+.ellipsis-overflow {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.force-wrap {
+    word-wrap: break-word;
+}
+.inline-form {
+    margin: 0;
+}
+.body-section {
+    margin-top: 10px;
+}
+.body-subsection {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.footer-section {
+    margin-top: 60px;
+    border-top: 1px solid #ccc;
+    padding: 20px 0;
+}
+.inline-block {
+    display: inline-block;
+    margin: 0;
+}
+a.big-link {
+    display: block;
+}
+.h4sized {
+    line-height: 20px;
+    margin: 10px 0;
+}
+@media (max-width: 767px) {
+    .text-right, .text-center {
+        text-align: left;
+    }
+}
+.no-min-height [class*="span"] {
+    min-height: 0;
+}
+
+/* Page branding. */
+.endpoint-homepage .base-logo-container {
+    display: none;
+}
+.homepage-logo {
+    display: none;
+    float: left;
+    margin-right: 15px;
+    vertical-align: top;
+}
+.endpoint-homepage .homepage-logo {
+    display: inline-block;
+}
+.logo-outside {
+    padding: 12px 6px 6px 6px;
+    background-color: #000;
+    display: inline-block;
+    text-align: center;
+}
+.logo-inside {
+    border: 2px solid #fff;
+    border-radius: 50%;
+    padding: 0;
+    display: block;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    color: #fff;
+    letter-spacing: 1px;
+    font-size: 9px;
+    vertical-align: middle;
+}
+
+/* Homepage */
+.video-promo-container {
+    width: 100%;
+    height: 100%;
+}
+.video-promo {
+    width: 100%;
+}
+
+/* View styles */
+.build-release-first-row {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 5px;
+}
+.build-release-section + .build-release-section {
+    margin-top: 40px;
+}
+.build-candidate-section + .build-candidate-section {
+    margin-top: 5px;
+}
+.release-test-section + .release-test-section {
+    margin-top: 5px;
+}
+.test-result-mark {
+    font-weight: bold;
+    width: 20px;
+    text-align: left;
+    display: inline-block;
+}
+.status-panel {
+    margin-bottom: 20px;
+    margin-left: -10px;
+    padding: 10px;
+    border: 1px solid;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+.status-panel-normal {
+    color: #999999;
+    background-color: #eeeeee;
+    border-color: #cccccc;
+}
+.status-panel-info {
+    color: #3a87ad;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+.status-panel-error {
+    color: #b94a48;
+    background-color: #f2dede;
+    border-color: #eed3d7;
+}
+.status-panel-warning {
+    color: #c09853;
+    background-color: #fcf8e3;
+    border-color: #fbeed5;
+}
+.run-image-link {
+    min-height: 200px;
+    display: block;
+}
+.run-image {
+    border: 1px solid #ccc;
+}
+.diff-section {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+#artifact-iframe-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 5px;
+}
+#artifact-iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.dialog-container {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: scroll;
+}
+.dialog-wrapper {
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    text-align: center;
+}
+.dialog-inner {
+    box-sizing: border-box;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #fff;
+    display: inline-block;
+    min-width: 200px;
+    position: relative;
+    text-align: left;
+}
+.dialog-close {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    line-height: 10px;
+    font-size: 18px;
+    color: #ccc;
+    padding: 3px;
+    margin: 0;
+    cursor: pointer;
+    display: inline-block;
+}
+.dialog-close:hover {
+    color: #000;
+}
+.dialog-close:active {
+    color: #aaa;
+}
+
+/* For internal consoles and debug pages. */
+.workqueue-index-first-row {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 5px;
+    margin-top: 15px;
+}
+
+.workqueue-task-row {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.workqueue-task-row + .workqueue-task-row {
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+}
+
+.debug-email-body {
+    width: 800px;
+    border: 1px solid #000;
+}
